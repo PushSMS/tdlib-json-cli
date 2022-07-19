@@ -61,9 +61,17 @@ function processFunctionOrObject(name, html, type) {
         const part = matches[1]
         part.replace(/<tr class="memitem:((?:.|\n)*?)<\/tr>(?:.|\n)*?<tr class="memdesc:((?:.|\n)*?)<\/tr>/g, function (_, itemPart, descPart) {
             let field = {}
-            itemPart
-            .replace(/&#160;/g, '')
-            .replace(/\/a>\n(.*?)<\/td>.*>(.*)<\/a>/, function (_, type, name) {
+            itemPart = itemPart.replace(/&#160;/g, '')
+
+            let regex
+
+            if (itemPart.includes('<a class="el"')) {
+              regex = /<a class="el".*>(.*)<\/a>.*<b>(.*)_<\/b>/
+            } else {
+              regex = /<\/a>\n(.*)<\/td><td class="memItemRight".*<b>(.*)_<\/b>/
+            }
+
+            itemPart.replace(regex, function (_, type, name) {
                 type = parseType(type)
                 name = entities.decode(name).replace(/_$/, '')
                 field.type = type
